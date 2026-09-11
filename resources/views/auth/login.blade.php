@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar — Revolve')
+@section('title', 'Masuk — Revolve')
 
 @section('content')
 <div class="min-h-[calc(100vh-68px)] flex items-center justify-center py-10">
@@ -19,26 +19,19 @@
                         </span>
                         <span class="font-heading text-xl font-bold">Revolve</span>
                     </div>
-                    <h1 class="text-headline-lg mb-4">Mulai Hidup Sehat</h1>
-                    <p class="text-white/70 leading-relaxed">Buat akun dan nikmati kemudahan belanja produk kesehatan terbaik.</p>
+                    <h1 class="text-headline-lg mb-4">Selamat Datang Kembali</h1>
+                    <p class="text-white/70 leading-relaxed">Masuk untuk melanjutkan belanja produk kesehatan pilihan Anda.</p>
                 </div>
-                <div class="relative space-y-4">
+                <div class="relative">
                     <div class="flex items-center gap-3">
                         <span class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                            <svg class="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
                         </span>
                         <div>
-                            <p class="text-sm font-semibold">Belanja Mudah</p>
-                            <p class="text-xs text-white/60">Proses checkout cepat dan aman</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10"/></svg>
-                        </span>
-                        <div>
-                            <p class="text-sm font-semibold">Pantau Pesanan</p>
-                            <p class="text-xs text-white/60">Lacak status order secara real-time</p>
+                            <p class="text-sm font-semibold">100% Produk Terkurasi</p>
+                            <p class="text-xs text-white/60">Kualitas terbaik untuk kesehatan Anda</p>
                         </div>
                     </div>
                 </div>
@@ -49,44 +42,39 @@
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                     Kembali
                 </a>
-                <h1 class="text-headline-md mb-2">Buat Akun Baru</h1>
-                <p class="text-sm text-text-secondary mb-8">Sudah punya akun? <a href="{{ route('login') }}" class="text-primary font-semibold hover:text-primary-hover">Masuk di sini</a></p>
+                <h1 class="text-headline-md mb-2">Masuk ke Akun</h1>
+                <p class="text-sm text-text-secondary mb-8">Belum punya akun? <a href="{{ route('register') }}" class="text-primary font-semibold hover:text-primary-hover">Daftar di sini</a></p>
 
                 @include('partials.alerts')
 
-                <form method="POST" action="{{ route('register') }}" class="space-y-5">
+                <form method="POST" action="{{ route('login') }}" class="space-y-5">
                     @csrf
                     <div class="form-group mb-5!">
-                        <label for="name" class="form-label">Nama Lengkap</label>
-                        <input type="text" name="name" id="name" value="{{ old('name') }}" required autofocus
-                            class="form-input @error('name') is-error @enderror" placeholder="Nama Anda">
-                        @error('name')
-                            <span class="form-error">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    <div class="form-group mb-5!">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" name="email" id="email" value="{{ old('email') }}" required
+                        <input type="email" name="email" id="email" value="{{ old('email') }}" required autofocus
                             class="form-input @error('email') is-error @enderror" placeholder="nama@email.com">
                         @error('email')
                             <span class="form-error">{{ $message }}</span>
                         @enderror
                     </div>
-                    <div class="form-group mb-5!">
+                    <div class="form-group mb-2!">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" name="password" id="password" required
-                            class="form-input @error('password') is-error @enderror" placeholder="Minimal 8 karakter">
+                            class="form-input @error('password') is-error @enderror" placeholder="••••••••">
                         @error('password')
                             <span class="form-error">{{ $message }}</span>
                         @enderror
                     </div>
-                    <div class="form-group mb-6!">
-                        <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
-                        <input type="password" name="password_confirmation" id="password_confirmation" required
-                            class="form-input @error('password') is-error @enderror" placeholder="Ulangi password">
+                    <div class="flex items-center justify-between mb-6">
+                        <label class="flex items-center gap-2 cursor-pointer text-sm text-text-secondary">
+                            <input type="checkbox" name="remember" id="remember" value="1" class="form-checkbox"
+                                @checked(old('remember'))>
+                            Ingat saya
+                        </label>
+                        <a href="{{ route('password.request') }}" class="text-sm text-primary font-semibold hover:text-primary-hover">Lupa password?</a>
                     </div>
                     <button type="submit" class="btn btn-primary w-full">
-                        Daftar
+                        Masuk
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </button>
                 </form>

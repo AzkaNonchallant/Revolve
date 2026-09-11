@@ -57,7 +57,7 @@ class CheckoutController extends Controller
         }
 
         $shippingCost = 0;
-        if ($validated['shipping_rate_id']) {
+        if (!empty($validated['shipping_rate_id'])) {
             $shippingRate = ShippingRate::findOrFail($validated['shipping_rate_id']);
             $totalWeightKg = ceil($cart->items->sum(fn($item) => $item->product->weight * $item->quantity) / 1000);
             $shippingCost = $shippingRate->rate_per_kg * max($totalWeightKg, 1);
@@ -70,15 +70,15 @@ class CheckoutController extends Controller
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'address_id' => $address->id,
-                'courier_id' => $validated['courier_id'],
-                'shipping_rate_id' => $validated['shipping_rate_id'],
+                'courier_id' => ($validated['courier_id'] ?? null) ?: null,
+                'shipping_rate_id' => ($validated['shipping_rate_id'] ?? null) ?: null,
                 'order_number' => 'ORD-' . Str::upper(Str::random(10)),
                 'subtotal' => $subtotal,
                 'shipping_cost' => $shippingCost,
                 'discount' => 0,
                 'total' => $total,
                 'payment_method' => $validated['payment_method'],
-                'delivery_schedule' => $validated['delivery_schedule'],
+                'delivery_schedule' => $validated['delivery_schedule'] ?? null,
                 'status' => 'waiting_payment',
             ]);
 
