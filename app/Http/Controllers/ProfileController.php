@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password as PasswordRule;
@@ -18,11 +18,14 @@ class ProfileController extends Controller
     public function update(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . Auth::id(),
+            'avatar' => 'nullable|image|max:2048',
         ]);
 
-        Auth::user()->update($validated);
+        $user = Auth::user();
+
+        if ($request->hasFile('avatar')) {
+            $user->update(['avatar' => $request->file('avatar')->store('avatars', 'public')]);
+        }
 
         return back()->with('success', 'Profil diperbarui');
     }

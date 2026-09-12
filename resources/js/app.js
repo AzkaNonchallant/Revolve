@@ -26,4 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
             mobileMenu.classList.toggle('hidden');
         });
     }
+
+    const sidebarToggle = document.querySelector('[data-dashboard-sidebar-toggle]');
+    const sidebar = document.querySelector('[data-dashboard-sidebar]');
+
+    if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('is-open');
+        });
+    }
 });

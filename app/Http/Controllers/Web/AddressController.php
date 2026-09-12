@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Address;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AddressController extends Controller
@@ -26,17 +26,7 @@ class AddressController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'receiver_name' => 'required|string|max:100',
-            'phone' => 'required|string|max:20',
-            'province' => 'required|string|max:100',
-            'city' => 'required|string|max:100',
-            'district' => 'nullable|string|max:100',
-            'village' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:10',
-            'full_address' => 'required|string',
-            'is_default' => 'nullable|boolean',
-        ]);
+        $validated = $this->validatedData($request);
 
         $validated['user_id'] = Auth::id();
 
@@ -64,19 +54,11 @@ class AddressController extends Controller
             abort(403);
         }
 
-        $validated = $request->validate([
-            'receiver_name' => 'sometimes|required|string|max:100',
-            'phone' => 'sometimes|required|string|max:20',
-            'province' => 'sometimes|required|string|max:100',
-            'city' => 'sometimes|required|string|max:100',
-            'district' => 'nullable|string|max:100',
-            'village' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:10',
-            'full_address' => 'sometimes|required|string',
-            'is_default' => 'nullable|boolean',
-        ]);
+        $validated = $this->validatedData($request, true);
 
-        if ($validated['is_default'] ?? false) {
+        $validated = array_filter($validated, fn ($v) => $v !== null);
+
+        if (array_key_exists('is_default', $validated) && $validated['is_default']) {
             Address::where('user_id', Auth::id())->update(['is_default' => false]);
         }
 
@@ -106,5 +88,23 @@ class AddressController extends Controller
         $address->update(['is_default' => true]);
 
         return back()->with('success', 'Alamat utama diubah');
+    }
+
+    private function validatedData(Request $request, bool $partial = false): array
+    {
+        return $request->validate([
+            'receiver_name' => ($partial ? 'sometimes|' : '').'required|string|max:100',
+            'phone' => ($partial ? 'sometimes|' : '').'required|string|max:20',
+            'province' => ($partial ? 'sometimes|' : '').'required|string|max:100',
+            'city' => ($partial ? 'sometimes|' : '').'required|string|max:100',
+            'district' => 'nullable|string|max:100',
+            'village' => 'nullable|string|max:100',
+            'postal_code' => 'nullable|string|max:10',
+            'full_address' => ($partial ? 'sometimes|' : '').'required|string|max:1000',
+            'courier_note' => 'nullable|string|max:500',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'is_default' => 'nullable|boolean',
+        ]);
     }
 }

@@ -22,13 +22,26 @@
             {{-- Items --}}
             <div class="lg:col-span-2 space-y-4">
                 @php
-                    $subtotal = $cart->items->sum(fn ($item) => (float) $item->product->price * $item->quantity);
+                    $selectedItems = $cart->items->filter(fn ($i) => $i->is_selected);
                 @endphp
                 @foreach ($cart->items as $item)
+                    @php
+                        $price = $item->effectivePrice();
+                        $original = (float) $item->product->price;
+                        $hasDiscount = $item->product->hasDiscount();
+                        $cover = $item->product->primaryImage?->image ?? $item->product->image;
+                        $isSelected = (bool) $item->is_selected;
+                    @endphp
                     <div class="card elevation-1 bg-surface p-4 lg:p-5 flex flex-col sm:flex-row gap-4">
+                        <button type="button" data-select-toggle data-action="{{ route('cart.select', $item) }}"
+                            class="w-6 h-6 shrink-0 mt-1 rounded-md border-2 flex items-center justify-center transition-colors {{ $isSelected ? 'bg-primary border-primary' : 'border-border' }}" aria-label="Pilih produk">
+                            @if ($isSelected)
+                                <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                            @endif
+                        </button>
                         <a href="{{ route('products.show', $item->product) }}" class="w-24 h-24 rounded-lg overflow-hidden bg-surface-subtle shrink-0">
-                            @if ($item->product->image)
-                                <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" class="w-full h-full object-cover">
+                            @if ($cover)
+                                <img src="{{ asset('storage/' . $cover) }}" alt="{{ $item->product->name }}" class="w-full h-full object-cover">
                             @else
                                 <div class="w-full h-full flex items-center justify-center">
                                     <svg class="w-8 h-8 text-text-muted/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -45,16 +58,26 @@
                                     <p class="text-label-sm text-text-muted mb-0.5">{{ $item->product->category->name }}</p>
                                 @endif
                                 <a href="{{ route('products.show', $item->product) }}" class="text-title-md hover:text-primary transition-colors line-clamp-1">{{ $item->product->name }}</a>
-                                <p class="text-sm text-text-secondary mt-0.5">Rp {{ number_format((float) $item->product->price, 0, ',', '.') }}</p>
-                                @if ($item->product->stock <= 0)
+                                @if ($item->variant)
+                                    <p class="text-sm text-text-secondary mt-0.5">Varian: {{ $item->variant->label }}</p>
+                                @endif
+                                <p class="text-sm text-text-secondary mt-0.5">
+                                    @if ($hasDiscount)
+                                        <span class="text-text-muted line-through mr-1">Rp {{ number_format($original, 0, ',', '.') }}</span>
+                                    @endif
+                                    Rp {{ number_format($price, 0, ',', '.') }}
+                                </p>
+                                @if (($item->variant ? $item->variant->stock : $item->product->stock) <= 0)
                                     <p class="text-xs text-error font-semibold mt-1">Stok sudah habis</p>
                                 @endif
                             </div>
                             <div class="flex items-center gap-3">
-                                <form action="{{ route('cart.update', $item) }}" method="POST" class="flex items-center gap-1">
+                                <form action="{{ route('cart.update', $item) }}" method="POST" class="flex items-center gap-1" data-qty-form>
                                     @csrf
                                     @method('PATCH')
-                                    <input type="hidden" name="quantity" data-qty-input value="{{ $item->quantity }}" min="1" max="{{ $item->product->stock }}">
+                                    <input type="hidden" name="quantity" data-qty-input value="{{ $item->quantity }}"
+                                        min="1" max="{{ $item->variant ? $item->variant->stock : $item->product->stock }}"
+                                        data-original="{{ $item->quantity }}">
                                     <button type="button" data-qty-minus class="w-9 h-9 flex items-center justify-center rounded-lg border border-border text-text-secondary hover:bg-surface-subtle transition-colors" aria-label="Kurangi jumlah">
                                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg>
                                     </button>
@@ -77,6 +100,10 @@
                         </div>
                     </div>
                 @endforeach
+                <form action="{{ route('cart.select', '__all__') }}" method="POST" id="select-all-form" class="hidden">
+                    @csrf
+                    @method('PATCH')
+                </form>
             </div>
 
             {{-- Summary --}}
@@ -85,8 +112,12 @@
                     <h2 class="text-headline-sm mb-6">Ringkasan Belanja</h2>
                     <dl class="space-y-3 mb-6">
                         <div class="flex items-center justify-between text-sm">
-                            <dt class="text-text-secondary">Subtotal ({{ $cart->items->count() }} produk)</dt>
-                            <dd class="font-semibold">Rp {{ number_format((float) $subtotal, 0, ',', '.') }}</dd>
+                            <dt class="text-text-secondary">Produk dipilih</dt>
+                            <dd class="font-semibold">{{ $selectedItems->count() }} item</dd>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <dt class="text-text-secondary">Subtotal</dt>
+                            <dd class="font-semibold">Rp {{ number_format($subtotal, 0, ',', '.') }}</dd>
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <dt class="text-text-secondary">Ongkos kirim</dt>
@@ -95,10 +126,10 @@
                         <div class="divider my-4!"></div>
                         <div class="flex items-center justify-between">
                             <dt class="text-title-md">Total</dt>
-                            <dd class="text-price text-2xl">Rp {{ number_format((float) $subtotal, 0, ',', '.') }}</dd>
+                            <dd class="text-price text-2xl">Rp {{ number_format($subtotal, 0, ',', '.') }}</dd>
                         </div>
                     </dl>
-                    <a href="{{ route('checkout.show') }}" class="btn btn-primary w-full mb-3">
+                    <a href="{{ route('checkout.show') }}" class="btn btn-primary w-full mb-3 {{ $selectedItems->isEmpty() ? 'opacity-50 pointer-events-none' : '' }}">
                         Lanjut ke Checkout
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </a>
@@ -114,7 +145,7 @@
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
             <h3 class="text-title-md mb-2">Keranjang masih kosong</h3>
-            <p>Yuk mulai belanja produk kesehatan favorit Anda.</p>
+            <p>Yuk mulai belanja fashion favorit Anda.</p>
             <a href="{{ route('products.index') }}" class="btn btn-primary">Jelajahi Produk</a>
         </div>
     @endif
@@ -124,7 +155,7 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('form[data-qty-input]').forEach((form) => {
+    document.querySelectorAll('form[data-qty-form]').forEach((form) => {
         const input = form.querySelector('[data-qty-input]');
         const display = form.querySelector('[data-qty-display]');
         const minus = form.querySelector('[data-qty-minus]');
@@ -140,22 +171,33 @@ document.addEventListener('DOMContentLoaded', () => {
             save.classList.toggle('hidden', value === parseInt(input.dataset.original, 10));
         };
 
-        input.dataset.original = input.value;
-        save.classList.add('hidden');
-
         minus.addEventListener('click', () => {
             const current = parseInt(input.value, 10) || 1;
-            if (current > 1) {
-                input.value = current - 1;
-                sync();
-            }
+            if (current > 1) { input.value = current - 1; sync(); }
         });
         plus.addEventListener('click', () => {
             const current = parseInt(input.value, 10) || 1;
-            if (current < max) {
-                input.value = current + 1;
-                sync();
-            }
+            if (current < max) { input.value = current + 1; sync(); }
+        });
+    });
+
+    document.querySelectorAll('[data-select-toggle]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = btn.dataset.action;
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = document.querySelector('meta[name="csrf-token"]').content;
+            const method = document.createElement('input');
+            method.type = 'hidden';
+            method.name = '_method';
+            method.value = 'PATCH';
+            form.appendChild(csrf);
+            form.appendChild(method);
+            document.body.appendChild(form);
+            form.submit();
         });
     });
 });

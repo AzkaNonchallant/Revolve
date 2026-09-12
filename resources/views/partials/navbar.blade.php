@@ -32,8 +32,19 @@
 
             @auth
                 @php
-                    $cartCount = auth()->user()->cart?->items()->count() ?? 0;
+                    $cartCount = auth()->user()->cart?->items()->sum('quantity') ?? 0;
+                    $wishlistCount = auth()->user()->wishlist?->items()->count() ?? 0;
                 @endphp
+                <a href="{{ route('wishlist.index') }}" class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-muted transition-colors" aria-label="Wishlist">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"/>
+                    </svg>
+                    @if ($wishlistCount > 0)
+                        <span class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-white text-[11px] font-bold flex items-center justify-center">
+                            {{ min($wishlistCount, 99) }}
+                        </span>
+                    @endif
+                </a>
                 <a href="{{ route('cart.index') }}" class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-muted transition-colors" aria-label="Keranjang">
                     <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="9" cy="21" r="1"/>
@@ -61,7 +72,10 @@
                         <div class="py-1">
                             <a href="{{ route('profile.edit') }}" class="block px-4 py-2.5 text-sm hover:bg-surface-subtle">Profil</a>
                             <a href="{{ route('orders.index') }}" class="block px-4 py-2.5 text-sm hover:bg-surface-subtle">Pesanan</a>
+                            <a href="{{ route('wishlist.index') }}" class="block px-4 py-2.5 text-sm hover:bg-surface-subtle">Wishlist</a>
                             <a href="{{ route('addresses.index') }}" class="block px-4 py-2.5 text-sm hover:bg-surface-subtle">Alamat</a>
+                            <a href="{{ route('notifications.index') }}" class="block px-4 py-2.5 text-sm hover:bg-surface-subtle">Notifikasi</a>
+                            <a href="{{ auth()->user()->dashboardRoute() }}" class="block px-4 py-2.5 text-sm font-semibold text-primary hover:bg-surface-subtle">Dashboard</a>
                         </div>
                         <div class="py-1 border-t border-surface-muted">
                             <form action="{{ route('logout') }}" method="POST">
@@ -88,8 +102,10 @@
             <a href="{{ route('products.index') }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-muted">Produk</a>
             @auth
                 <a href="{{ route('orders.index') }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-muted">Pesanan</a>
+                <a href="{{ route('wishlist.index') }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-muted">Wishlist</a>
                 <a href="{{ route('addresses.index') }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-muted">Alamat</a>
                 <a href="{{ route('profile.edit') }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-muted">Profil</a>
+                <a href="{{ auth()->user()->dashboardRoute() }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium text-primary hover:bg-surface-muted">Dashboard</a>
             @else
                 <a href="{{ route('login') }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-muted">Masuk</a>
                 <a href="{{ route('register') }}" class="block px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-surface-muted">Daftar</a>

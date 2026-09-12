@@ -13,10 +13,11 @@
         <a href="{{ route('orders.index') }}" class="chip {{ !request('status') ? 'chip-active' : '' }}">Semua</a>
         @foreach ([
             'waiting_payment' => 'Menunggu Pembayaran',
+            'paid' => 'Sudah Dibayar',
             'processed' => 'Diproses',
             'packing' => 'Dikemas',
             'shipped' => 'Dikirim',
-            'delivered' => 'Selesai',
+            'completed' => 'Selesai',
             'cancelled' => 'Dibatalkan',
         ] as $value => $label)
             <a href="{{ route('orders.index', ['status' => $value]) }}" class="chip {{ request('status') === $value ? 'chip-active' : '' }}">{{ $label }}</a>
@@ -44,8 +45,8 @@
                         <div class="flex -space-x-3">
                             @foreach ($order->items->take(4) as $item)
                                 <div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-subtle ring-2 ring-surface">
-                                    @if ($item->product->image)
-                                        <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" class="w-full h-full object-cover">
+                                    @if ($item->product?->primaryImage?->image ?? $item->product?->image)
+                                        <img src="{{ asset('storage/' . ($item->product->primaryImage?->image ?? $item->product->image)) }}" alt="{{ $item->product->name }}" class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center">
                                             <svg class="w-4 h-4 text-text-muted/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>

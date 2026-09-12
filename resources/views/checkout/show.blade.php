@@ -4,7 +4,15 @@
 
 @section('content')
 <div class="container-app pt-8 lg:pt-12 pb-16">
-    <h1 class="text-headline-lg mb-8">Checkout</h1>
+    <nav class="flex items-center gap-2 text-sm text-text-muted mb-6" aria-label="Breadcrumb">
+        <a href="{{ route('home') }}" class="hover:text-text-primary">Beranda</a>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <a href="{{ route('cart.index') }}" class="hover:text-text-primary">Keranjang</a>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span class="text-text-primary font-medium">Checkout</span>
+    </nav>
+
+    @include('partials.alerts')
 
     <form action="{{ route('checkout.store') }}" method="POST" id="checkout-form">
         @csrf
@@ -22,7 +30,7 @@
                     @if ($addresses->isNotEmpty())
                         <div class="space-y-3">
                             @foreach ($addresses as $address)
-                                <label class="flex items-start gap-3 p-4 rounded-xl border border-border cursor-pointer hover:border-border-hover transition-colors {{ (old('address_id') == $address->id || (!old('address_id') && $loop->first)) ? 'border-obsidian bg-surface-subtle' : '' }}" data-address-card>
+                                <label class="flex items-start gap-3 p-4 rounded-xl border border-border cursor-pointer hover:border-border-hover transition-colors {{ $address->is_default ? 'border-obsidian bg-surface-subtle' : '' }}" data-address-card>
                                     <input type="radio" name="address_id" value="{{ $address->id }}" class="form-radio mt-1"
                                         @checked(old('address_id', $addresses->where('is_default', true)->first()?->id ?? $addresses->first()->id) == $address->id)>
                                     <span class="flex-grow">
@@ -57,7 +65,7 @@
 
                 <div class="card elevation-1 bg-surface p-6 lg:p-8">
                     <h2 class="text-headline-sm mb-2">Metode Pengiriman</h2>
-                    <p class="text-sm text-text-secondary mb-6">Berat total: {{ number_format($totalWeight, 0, ',', '.') }} g ({{ ceil($totalWeight / 1000) }} kg)</p>
+                    <p class="text-sm text-text-secondary mb-6">Berat total: {{ number_format($totalWeight, 0, ',', '.') }} g ({{ max(ceil($totalWeight / 1000), 1) }} kg)</p>
 
                     @if ($couriers->isNotEmpty())
                         <div class="space-y-4">
@@ -107,6 +115,40 @@
                 </div>
 
                 <div class="card elevation-1 bg-surface p-6 lg:p-8">
+                    <h2 class="text-headline-sm mb-6">Voucher</h2>
+                    @if ($vouchers->isNotEmpty())
+                        <div class="space-y-3">
+                            <label class="flex items-center gap-3 p-4 rounded-xl border border-border cursor-pointer hover:border-border-hover transition-colors">
+                                <input type="radio" name="voucher_id" value="" class="form-radio"
+                                    @checked(!old('voucher_id'))>
+                                <span class="flex-grow text-sm font-semibold">Tanpa voucher</span>
+                            </label>
+                            @foreach ($vouchers as $voucher)
+                                <label class="flex items-start gap-3 p-4 rounded-xl border border-dashed border-primary/50 cursor-pointer bg-primary/5">
+                                    <input type="radio" name="voucher_id" value="{{ $voucher->id }}" class="form-radio mt-1 accent-[#FF5400]"
+                                        @checked(old('voucher_id') == $voucher->id)>
+                                    <span class="flex-grow">
+                                        <span class="inline-flex items-center gap-2"><span class="badge badge-primary">{{ $voucher->code }}</span></span>
+                                        <span class="block text-sm font-semibold mt-1.5">{{ $voucher->name }}</span>
+                                        <span class="block text-sm text-text-secondary mt-0.5">
+                                            {{ $voucher->type === 'percent' ? $voucher->value . '%' : 'Rp ' . number_format($voucher->value, 0, ',', '.') }} potongan
+                                            @if ($voucher->min_purchase)
+                                                · min. belanja Rp {{ number_format($voucher->min_purchase, 0, ',', '.') }}
+                                            @endif
+                                        </span>
+                                        <span class="block text-xs text-text-muted mt-1">
+                                            Berlaku hingga {{ $voucher->ends_at?->format('d M Y') ?? 'selamanya' }}
+                                        </span>
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-sm text-text-muted">Tidak ada voucher yang berlaku untuk keranjang ini.</p>
+                    @endif
+                </div>
+
+                <div class="card elevation-1 bg-surface p-6 lg:p-8">
                     <h2 class="text-headline-sm mb-6">Metode Pembayaran</h2>
                     @php
                         $paymentMethods = [
@@ -129,15 +171,6 @@
                         <span class="form-error">{{ $message }}</span>
                     @enderror
                 </div>
-
-                <div class="card elevation-1 bg-surface p-6 lg:p-8">
-                    <label for="delivery_schedule" class="form-label">Jadwal Pengiriman <span class="font-normal text-text-muted">(opsional)</span></label>
-                    <input type="datetime-local" name="delivery_schedule" id="delivery_schedule" value="{{ old('delivery_schedule') }}"
-                        class="form-input @error('delivery_schedule') is-error @enderror">
-                    @error('delivery_schedule')
-                        <span class="form-error">{{ $message }}</span>
-                    @enderror
-                </div>
             </div>
 
             {{-- Summary --}}
@@ -145,11 +178,11 @@
                 <div class="card elevation-1 bg-surface p-6 lg:p-8">
                     <h2 class="text-headline-sm mb-6">Ringkasan Pesanan</h2>
                     <div class="space-y-3 max-h-64 overflow-y-auto mb-6 pr-1">
-                        @foreach ($cart->items as $item)
+                        @foreach ($items as $item)
                             <div class="flex items-center gap-3">
                                 <div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-subtle shrink-0 relative">
-                                    @if ($item->product->image)
-                                        <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" class="w-full h-full object-cover">
+                                    @if ($item->product->primaryImage?->image ?? $item->product->image)
+                                        <img src="{{ asset('storage/' . ($item->product->primaryImage?->image ?? $item->product->image)) }}" alt="{{ $item->product->name }}" class="w-full h-full object-cover">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center">
                                             <svg class="w-4 h-4 text-text-muted/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
@@ -159,16 +192,19 @@
                                 </div>
                                 <div class="flex-grow min-w-0">
                                     <p class="text-sm font-medium truncate">{{ $item->product->name }}</p>
-                                    <p class="text-xs text-text-muted">Rp {{ number_format((float) $item->product->price, 0, ',', '.') }}</p>
+                                    @if ($item->variant)
+                                        <p class="text-xs text-text-muted">{{ $item->variant->label }}</p>
+                                    @endif
+                                    <p class="text-xs text-text-muted">Rp {{ number_format($item->effectivePrice(), 0, ',', '.') }}</p>
                                 </div>
-                                <span class="text-sm font-semibold whitespace-nowrap">Rp {{ number_format((float) $item->product->price * $item->quantity, 0, ',', '.') }}</span>
+                                <span class="text-sm font-semibold whitespace-nowrap">Rp {{ number_format($item->effectivePrice() * $item->quantity, 0, ',', '.') }}</span>
                             </div>
                         @endforeach
                     </div>
                     <dl class="space-y-3 mb-6">
                         <div class="flex items-center justify-between text-sm">
                             <dt class="text-text-secondary">Subtotal</dt>
-                            <dd class="font-semibold">Rp {{ number_format((float) $subtotal, 0, ',', '.') }}</dd>
+                            <dd class="font-semibold">Rp {{ number_format($subtotalRaw, 0, ',', '.') }}</dd>
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <dt class="text-text-secondary">Ongkos kirim</dt>
@@ -177,10 +213,10 @@
                         <div class="divider my-4!"></div>
                         <div class="flex items-center justify-between">
                             <dt class="text-title-md">Total</dt>
-                            <dd class="text-price text-2xl" data-total-display>Rp {{ number_format((float) $subtotal, 0, ',', '.') }}</dd>
+                            <dd class="text-price text-2xl" data-total-display>Rp {{ number_format($subtotalRaw, 0, ',', '.') }}</dd>
                         </div>
                     </dl>
-                    <button type="submit" id="place-order-btn" class="btn btn-primary w-full" {{ $addresses->isEmpty() || $cart->items->isEmpty() ? 'disabled' : '' }}>
+                    <button type="submit" id="place-order-btn" class="btn btn-primary w-full" {{ $addresses->isEmpty() ? 'disabled' : '' }}>
                         Buat Pesanan
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </button>
@@ -198,26 +234,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const courierInput = document.querySelector('[data-courier-input]');
     const shippingDisplay = document.querySelector('[data-shipping-display]');
     const totalDisplay = document.querySelector('[data-total-display]');
-    const subtotal = {{ $subtotal }};
+    const subtotal = {{ $subtotalRaw }};
 
-    if (!courierInput || !shippingDisplay || !totalDisplay) return;
+    const updateTotal = () => {
+        const voucher = document.querySelector('input[name="voucher_id"]:checked');
+        let discount = 0;
+        let total = subtotal + (parseFloat(courierInput?.dataset.cost ?? 0) || 0);
+        totalDisplay.textContent = 'Rp ' + total.toLocaleString('id-ID');
+    };
 
-    document.querySelectorAll('[data-shipping-option]').forEach((option) => {
-        const radio = option.querySelector('input[type="radio"]');
-        radio.addEventListener('change', () => {
-            if (!radio.checked) return;
-            courierInput.value = radio.dataset.courier;
-            const cost = parseFloat(radio.dataset.cost) || 0;
-            shippingDisplay.textContent = 'Rp ' + cost.toLocaleString('id-ID');
-            shippingDisplay.classList.remove('text-text-muted');
-            const total = subtotal + cost;
-            totalDisplay.textContent = 'Rp ' + total.toLocaleString('id-ID');
+    if (courierInput && shippingDisplay && totalDisplay) {
+        document.querySelectorAll('[data-shipping-option]').forEach((option) => {
+            const radio = option.querySelector('input[type="radio"]');
+            radio.addEventListener('change', () => {
+                if (!radio.checked) return;
+                courierInput.value = radio.dataset.courier;
+                courierInput.dataset.cost = radio.dataset.cost;
+                const cost = parseFloat(radio.dataset.cost) || 0;
+                shippingDisplay.textContent = 'Rp ' + cost.toLocaleString('id-ID');
+                shippingDisplay.classList.remove('text-text-muted');
+                updateTotal();
+            });
+
+            if (radio.checked) {
+                radio.dispatchEvent(new Event('change'));
+            }
         });
-
-        if (radio.checked) {
-            radio.dispatchEvent(new Event('change'));
-        }
-    });
+    }
 });
 </script>
 @endpush
