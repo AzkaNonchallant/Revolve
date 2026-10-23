@@ -48,6 +48,29 @@ class UserChangeRequest extends Model
         return self::FIELDS[$this->field] ?? ucfirst($this->field);
     }
 
+    public function getOldValueDisplayAttribute(): string
+    {
+        return self::displayValue($this->old_value);
+    }
+
+    public function getNewValueDisplayAttribute(): string
+    {
+        return self::displayValue($this->new_value);
+    }
+
+    private static function displayValue(mixed $value): string
+    {
+        if ($value === null || $value === '') {
+            return '—';
+        }
+
+        if (is_array($value) || is_object($value)) {
+            return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) ?: '—';
+        }
+
+        return (string) $value;
+    }
+
     public static function statusLabel(string $status): string
     {
         return match ($status) {

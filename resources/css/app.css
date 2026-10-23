@@ -11,6 +11,7 @@
 
     --color-primary: #FF5400;
     --color-primary-hover: #E64A00;
+    --color-primary-ink: #B23B00;
     --color-primary-light: rgba(255, 84, 0, 0.1);
     --color-obsidian: #0A0A0A;
     --color-obsidian-light: #262626;
@@ -69,12 +70,29 @@ h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-body);
 }
 
+.revolve-wordmark {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.06em;
+}
+
+.revolve-wordmark span {
+    color: var(--color-primary);
+}
+
 .text-display-xl {
     font-family: var(--font-heading);
     font-size: 3rem;
     font-weight: 800;
     line-height: 1;
     letter-spacing: -0.03em;
+}
+
+.text-body-lg {
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    line-height: 1.55;
 }
 
 @media (min-width: 1024px) {
@@ -200,6 +218,153 @@ h1, h2, h3, h4, h5, h6 {
     padding-right: 1rem;
 }
 
+/* Home merchandising: image-first like the supplied reference, with orange reserved for action. */
+.home-hero {
+    border-bottom: 1px solid rgba(10, 10, 10, 0.08);
+}
+
+.home-hero-media {
+    position: relative;
+    min-height: 300px;
+    overflow: hidden;
+    border-radius: 1rem;
+    background: var(--color-surface-muted);
+}
+
+.home-hero-media img {
+    min-height: 300px;
+}
+
+.home-hero-shoe {
+    width: auto;
+    height: 270px;
+    max-width: 78%;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    margin: auto;
+    padding: 0.5rem;
+    mix-blend-mode: multiply;
+}
+
+.home-hero-caption {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    padding: 0.75rem 1rem;
+    color: white;
+    background: rgba(10, 10, 10, 0.88);
+    border-radius: 0.5rem;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.home-hero-placeholder {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eceae7;
+    color: var(--color-obsidian);
+    font-family: var(--font-heading);
+    font-size: clamp(4rem, 10vw, 9rem);
+    font-weight: 800;
+    letter-spacing: -0.09em;
+}
+
+.home-hero-fallback .home-hero-placeholder {
+    background: var(--color-obsidian);
+    color: var(--color-primary);
+}
+
+.home-hero-dot {
+    display: block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: rgba(10, 10, 10, 0.25);
+}
+
+.home-hero-dot.is-active {
+    width: 1.75rem;
+    background: var(--color-primary);
+}
+
+.section-kicker {
+    margin-bottom: 0.35rem;
+    color: var(--color-primary-ink);
+    font-family: var(--font-heading);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.category-rail {
+    display: flex;
+    gap: 0.625rem;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #A1A1AA transparent;
+    padding: 0.125rem 0 0.625rem;
+    scroll-snap-type: x mandatory;
+}
+
+.category-chip {
+    min-height: 44px;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+    border: 1px solid #D4D4D8;
+    border-radius: 9999px;
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    font-family: var(--font-heading);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+    scroll-snap-align: start;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.category-chip:hover {
+    border-color: var(--color-primary);
+    background: #FFF7F3;
+}
+
+.seller-callout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 2rem;
+    border-radius: 1rem;
+    background: var(--color-obsidian);
+}
+
+@media (max-width: 639px) {
+    .home-hero-media,
+    .home-hero-media img,
+    .home-hero-placeholder {
+        min-height: 230px;
+    }
+
+    .home-hero-shoe {
+        height: 210px;
+        max-width: 74%;
+    }
+
+    .seller-callout {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 1.5rem;
+    }
+}
+
 @media (min-width: 768px) {
     .container-app {
         padding-left: 1.5rem;
@@ -253,7 +418,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-primary {
     background-color: var(--color-primary);
-    color: #FFFFFF;
+    color: var(--color-obsidian);
 }
 
 .btn-primary:hover {

@@ -23,7 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (mobileMenuToggle && mobileMenu) {
         mobileMenuToggle.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
+            const isHidden = mobileMenu.classList.toggle('hidden');
+            mobileMenuToggle.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
         });
     }
 

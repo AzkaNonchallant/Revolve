@@ -31,10 +31,13 @@
             </p>
         </div>
         <form action="{{ route('products.index') }}" method="GET" class="flex items-center gap-2 w-full lg:w-auto">
-            @foreach (['category', 'brand', 'size', 'color', 'min_price', 'max_price', 'sort'] as $preserve)
+            @foreach (['category', 'size', 'color', 'min_price', 'max_price', 'sort'] as $preserve)
                 @if (request()->filled($preserve))
                     <input type="hidden" name="{{ $preserve }}" value="{{ request($preserve) }}">
                 @endif
+            @endforeach
+            @foreach ((array) request('brand', []) as $br)
+                <input type="hidden" name="brand[]" value="{{ $br }}">
             @endforeach
             <div class="relative flex-grow lg:w-64">
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -69,7 +72,7 @@
                         @foreach ($categories as $cat)
                             <label class="flex items-center gap-2 text-sm cursor-pointer">
                                 <input type="radio" name="category" value="{{ $cat->id }}" onchange="this.form.submit()"
-                                    class="accent-[#FF5400]" {{ request('category') == $cat->id ? 'checked' : '' }}>
+                                    class="accent-[#FF5400]" {{ request()->query('category') == $cat->id ? 'checked' : '' }}>
                                 {{ $cat->name }}
                             </label>
                         @endforeach
@@ -211,7 +214,7 @@
                         @foreach ($categories as $cat)
                             <label class="flex items-center gap-2 text-sm cursor-pointer">
                                 <input type="radio" name="category" value="{{ $cat->id }}"
-                                    class="accent-[#FF5400]" {{ request('category') == $cat->id ? 'checked' : '' }}>
+                                    class="accent-[#FF5400]" {{ request()->query('category') == $cat->id ? 'checked' : '' }}>
                                 {{ $cat->name }}
                             </label>
                         @endforeach

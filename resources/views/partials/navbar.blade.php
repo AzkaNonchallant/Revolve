@@ -1,14 +1,7 @@
 <header class="navbar">
     <div class="container-app h-full flex items-center justify-between gap-4">
-        <a href="{{ route('home') }}" class="flex items-center gap-2 shrink-0">
-            <span class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5"/>
-                    <path d="M2 12l10 5 10-5"/>
-                </svg>
-            </span>
-            <span class="font-heading text-headline-sm font-bold">Revolve</span>
+        <a href="{{ route('home') }}" class="flex items-center shrink-0" aria-label="Revolve, beranda">
+            <span class="revolve-wordmark">Revolve<span>.</span></span>
         </a>
 
         <nav class="hidden md:flex items-center gap-1">
@@ -89,7 +82,7 @@
                 <a href="{{ route('login') }}" class="btn btn-outline btn-sm hidden sm:inline-flex">Masuk</a>
                 <a href="{{ route('register') }}" class="btn btn-primary btn-sm">Daftar</a>
             @endauth
-            <button type="button" data-mobile-menu-toggle class="md:hidden w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-muted transition-colors" aria-label="Menu">
+            <button type="button" data-mobile-menu-toggle class="md:hidden min-w-11 min-h-11 flex items-center justify-center rounded-full hover:bg-surface-muted transition-colors" aria-label="Buka menu" aria-expanded="false">
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <path d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>

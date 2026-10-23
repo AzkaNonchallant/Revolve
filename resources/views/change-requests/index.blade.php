@@ -69,8 +69,8 @@
                                 </span>
                             </div>
                             <div class="text-sm text-text-secondary space-y-0.5">
-                                <p><span class="text-text-muted">Lama:</span> <span class="line-through">{{ $request->old_value }}</span></p>
-                                <p><span class="text-text-muted">Baru:</span> <span class="font-semibold">{{ $request->new_value }}</span></p>
+                                <p><span class="text-text-muted">Lama:</span> <span class="line-through">{{ $request->old_value_display }}</span></p>
+                                <p><span class="text-text-muted">Baru:</span> <span class="font-semibold">{{ $request->new_value_display }}</span></p>
                                 <p class="text-xs text-text-muted">{{ $request->created_at->translatedFormat('d M Y, H:i') }}</p>
                                 @if ($request->status === 'rejected' && $request->admin_note)
                                     <p class="text-xs text-error mt-1">Alasan penolakan: {{ $request->admin_note }}</p>

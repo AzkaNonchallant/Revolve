@@ -29,11 +29,11 @@
             </div>
             <div>
                 <dt class="text-text-muted text-xs mb-1">Data Saat Ini</dt>
-                <dd class="text-sm text-text-secondary bg-surface-subtle rounded-lg px-4 py-3">{{ $changeRequest->old_value ?? '—' }}</dd>
+                <dd class="text-sm text-text-secondary bg-surface-subtle rounded-lg px-4 py-3">{{ $changeRequest->old_value_display }}</dd>
             </div>
             <div>
                 <dt class="text-text-muted text-xs mb-1">Permintaan Baru</dt>
-                <dd class="text-sm font-semibold bg-success/5 border border-success/30 rounded-lg px-4 py-3">{{ $changeRequest->new_value }}</dd>
+                <dd class="text-sm font-semibold bg-success/5 border border-success/30 rounded-lg px-4 py-3">{{ $changeRequest->new_value_display }}</dd>
             </div>
             @if ($changeRequest->reason)
                 <div>

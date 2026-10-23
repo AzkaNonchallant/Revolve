@@ -162,7 +162,12 @@ class ProductController extends Controller
 
         $products = $query->latest()->paginate(12);
 
-        return view('products.index', compact('products', 'category'));
+        $categories = Category::parents()->with('children')->get();
+        $brands = Brand::where('is_active', true)->get();
+        $sizes = ['S', 'M', 'L', 'XL', '40', '41', '42', '43', '44'];
+        $colors = ['Hitam', 'Putih', 'Merah', 'Biru', 'Abu-abu', 'Cokelat', 'Krem'];
+
+        return view('products.index', compact('products', 'category', 'categories', 'brands', 'sizes', 'colors'));
     }
 
     public function shop(Shop $shop)

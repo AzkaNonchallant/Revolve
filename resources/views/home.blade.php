@@ -1,90 +1,75 @@
 @extends('layouts.app')
 
-@section('title', 'Revolve — Belanja Fashion Style Terbaik')
+@section('title', 'Revolve | Pilihan Style Harian')
 
 @section('content')
-    {{-- Hero Banners --}}
+    {{-- Hero: the campaign image is the visual focal point, while the copy stays easy to scan. --}}
     @if ($heroBanners->isNotEmpty())
-        <section class="bg-obsidian text-white relative overflow-hidden">
-            <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-10" style="background: radial-gradient(circle, #FF5400 0%, transparent 70%);"></div>
+        <section class="home-hero bg-surface">
             <div data-hero-slider class="relative">
                 @foreach ($heroBanners as $banner)
                     <div class="data-hero-slide {{ $loop->first ? '' : 'hidden' }}" data-hero-slide>
-                        <div class="container-app py-14 lg:py-20 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-                            <div>
+                        <div class="container-app py-10 lg:py-14 grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-8 lg:gap-12 items-center">
+                            <div class="order-2 lg:order-1">
                                 @if ($banner->category)
-                                    <span class="badge badge-primary mb-6">{{ $banner->category->name }}</span>
-                                @else
-                                    <span class="badge badge-primary mb-6">Revolve Fashion</span>
+                                    <p class="text-label-sm text-primary-ink mb-5">{{ $banner->category->name }}</p>
                                 @endif
-                                <h1 class="text-display-xl mb-6">{!! $banner->title !!}</h1>
+                                <h1 class="text-display-xl max-w-xl mb-5">{!! $banner->title !!}</h1>
+                                <p class="max-w-md text-body-lg text-text-secondary mb-8">Pilihan fashion yang mudah dipadukan untuk hari yang terus bergerak.</p>
                                 <div class="flex flex-wrap gap-3">
-                                    <a href="{{ $banner->link ?: route('products.index') }}" class="btn btn-primary btn-lg">
-                                        Belanja Sekarang
-                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                                        </svg>
-                                    </a>
-                                    <a href="{{ route('products.index') }}" class="btn btn-outline btn-lg bg-transparent! border-white/30! text-white! hover:bg-white/10!">
-                                        Lihat Produk
-                                    </a>
+                                    <a href="{{ $banner->link ?: route('products.index') }}" class="btn btn-primary btn-lg">Belanja koleksi</a>
+                                    <a href="{{ route('products.index') }}" class="btn btn-outline btn-lg">Lihat semua produk</a>
                                 </div>
                             </div>
-                            @if ($banner->image)
-                                <div class="hidden lg:block">
-                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}" class="rounded-2xl w-full max-h-[360px] object-cover shadow-2xl">
-                                </div>
-                            @endif
+                            <div class="order-1 lg:order-2 home-hero-media">
+                                @if ($banner->image)
+                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}" class="w-full h-full object-cover">
+                                @else
+                                    <img src="{{ asset('images/revolve-hero-shoe.png') }}" alt="Sepatu Air Jordan hitam putih" class="home-hero-shoe">
+                                @endif
+                                <div class="home-hero-caption">{{ $banner->category?->name ?: 'Pilihan Revolve' }}</div>
+                            </div>
                         </div>
                     </div>
                 @endforeach
                 @if ($heroBanners->count() > 1)
-                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
+                    <div class="absolute bottom-6 left-4 lg:left-1/2 lg:-translate-x-1/2 flex items-center gap-2 z-10">
                         @foreach ($heroBanners as $banner)
-                            <button type="button" data-hero-dot class="w-2 h-2 rounded-full bg-white/40 hover:bg-white/80 transition-colors {{ $loop->first ? 'bg-white!' : '' }}" aria-label="Slide {{ $loop->iteration }}"></button>
+                            <button type="button" data-hero-dot class="w-11 h-11 flex items-center justify-center" aria-label="Tampilkan slide {{ $loop->iteration }}"><span class="home-hero-dot {{ $loop->first ? 'is-active' : '' }}"></span></button>
                         @endforeach
                     </div>
                 @endif
             </div>
         </section>
     @else
-        <section class="bg-obsidian text-white">
-            <div class="container-app py-14 lg:py-20 relative overflow-hidden">
-                <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-10" style="background: radial-gradient(circle, #FF5400 0%, transparent 70%);"></div>
-                <div class="relative">
-                    <span class="badge badge-primary mb-6">Revolve Fashion</span>
-                    <h1 class="text-display-xl mb-6">
-                        Upgrade Gayamu,<br class="hidden lg:block">
-                        <span class="text-primary">Tentukan Pilihanmu</span>
-                    </h1>
-                    <p class="text-lg text-white/70 mb-8 max-w-lg leading-relaxed">
-                        Temukan Style yang cocok dengan Anda! Sepatu, baju, celana, hingga jaket dari brand terbaik.
-                    </p>
-                    <div class="flex flex-wrap gap-3">
-                        <a href="{{ route('products.index') }}" class="btn btn-primary btn-lg">
-                            Belanja Sekarang
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M5 12h14M12 5l7 7-7 7"/>
-                            </svg>
-                        </a>
-                    </div>
+        <section class="home-hero home-hero-fallback">
+            <div class="container-app py-12 lg:py-16 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div>
+                    <p class="text-label-sm text-primary-ink mb-5">Revolve fashion</p>
+                    <h1 class="text-display-xl max-w-xl mb-5">Temukan gaya yang terasa seperti kamu.</h1>
+                    <p class="text-body-lg text-text-secondary max-w-md mb-8">Sepatu, pakaian, dan aksesori dari seller pilihan di satu tempat.</p>
+                    <a href="{{ route('products.index') }}" class="btn btn-primary btn-lg">Mulai belanja</a>
+                </div>
+                <div class="home-hero-media">
+                    <img src="{{ asset('images/revolve-hero-shoe.png') }}" alt="Sepatu Air Jordan hitam putih" class="home-hero-shoe">
                 </div>
             </div>
         </section>
     @endif
 
-    {{-- Categories --}}
-    <section class="container-app py-10 lg:py-14">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-headline-lg">Kategori</h2>
-            <a href="{{ route('products.index') }}" class="text-sm font-semibold text-primary hover:text-primary-hover">Semua Produk →</a>
+    <section class="container-app py-6 lg:py-8">
+        <div class="flex items-end justify-between gap-4 mb-4">
+            <div>
+                <p class="section-kicker">Jelajahi</p>
+                <h2 class="text-headline-md">Kategori pilihan</h2>
+            </div>
+            <a href="{{ route('products.index') }}" class="text-sm font-semibold text-primary-ink hover:text-primary-hover hidden sm:inline">Semua produk</a>
         </div>
         @if ($categories->isNotEmpty())
-            <div class="flex flex-wrap gap-2">
+            <div class="category-rail" aria-label="Kategori produk">
                 @foreach ($categories as $cat)
-                    <a href="{{ route('categories.show', $cat) }}" class="chip">
+                    <a href="{{ route('categories.show', $cat) }}" class="category-chip">
                         {{ $cat->name }}
-                        <span class="ml-1.5 text-xs text-text-muted">{{ $cat->products_count }}</span>
                     </a>
                 @endforeach
             </div>
@@ -93,14 +78,13 @@
         @endif
     </section>
 
-    {{-- Flash Sale / Discount Products --}}
-    <section class="container-app pb-14">
+    <section class="container-app pb-14" id="discounts">
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h2 class="text-headline-lg">Sedang Diskon</h2>
-                <p class="text-sm text-text-muted mt-1">Penawaran terbaik hari ini, buruan sebelum kehabisan!</p>
+                <p class="section-kicker">Harga pilihan</p>
+                <h2 class="text-headline-lg">Sedang diskon</h2>
             </div>
-            <a href="{{ route('products.index', ['sort' => 'discount']) }}" class="text-sm font-semibold text-primary hover:text-primary-hover hidden sm:inline">Lihat Semua →</a>
+                <a href="{{ route('products.index', ['sort' => 'discount']) }}" class="text-sm font-semibold text-primary-ink hover:text-primary-hover hidden sm:inline">Lihat semua</a>
         </div>
         @if ($discountProducts->isNotEmpty())
             <div class="grid-products">
@@ -110,19 +94,18 @@
             </div>
         @else
             <div class="card elevation-1 bg-surface py-10 text-center text-text-muted">
-                Belum ada produk diskon saat ini.
+                Belum ada produk diskon saat ini. Cek kembali setelah koleksi baru masuk.
             </div>
         @endif
     </section>
 
-    {{-- Latest Products --}}
     <section class="container-app pb-16">
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h2 class="text-headline-lg">Produk Terbaru</h2>
-                <p class="text-sm text-text-muted mt-1">Koleksi terbaru dari para seller Revolve.</p>
+                <p class="section-kicker">Baru masuk</p>
+                <h2 class="text-headline-lg">Koleksi terbaru</h2>
             </div>
-            <a href="{{ route('products.index') }}" class="text-sm font-semibold text-primary hover:text-primary-hover hidden sm:inline">Lihat Semua →</a>
+                <a href="{{ route('products.index') }}" class="text-sm font-semibold text-primary-ink hover:text-primary-hover hidden sm:inline">Lihat semua</a>
         </div>
         @if ($latestProducts->isNotEmpty())
             <div class="grid-products">
@@ -147,20 +130,18 @@
         @endif
     </section>
 
-    {{-- CTA Banner --}}
     <section class="container-app pb-16">
-        <div class="bg-obsidian rounded-2xl p-8 lg:p-12 flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden">
-            <div class="absolute -top-16 -right-16 w-64 h-64 rounded-full opacity-10" style="background: radial-gradient(circle, #FF5400 0%, transparent 70%);"></div>
-            <div class="relative">
-                <span class="badge badge-primary mb-3">Jualan di Revolve</span>
-                <h2 class="text-headline-md text-white mb-2">Jadilah Seller dan Jualan Fashion</h2>
-                <p class="text-white/60 text-sm">Daftarkan tokomu di Revolve, kelola produk, dan raih pelanggan lebih banyak.</p>
+        <div class="seller-callout">
+            <div>
+                <p class="section-kicker text-primary-fixed">Untuk seller</p>
+                <h2 class="text-headline-md text-white mb-2">Bawa koleksimu ke Revolve.</h2>
+                <p class="text-white/70 text-sm max-w-lg">Buka toko dan kelola produk fashionmu dari satu tempat.</p>
             </div>
-            <div class="relative shrink-0">
+            <div class="shrink-0">
                 @auth
-                    <a href="{{ route('seller-request.create') }}" class="btn btn-primary btn-lg">Buka Toko Sekarang</a>
+                    <a href="{{ route('seller-request.create') }}" class="btn btn-primary btn-lg">Buka toko</a>
                 @else
-                    <a href="{{ route('register') }}" class="btn btn-primary btn-lg">Daftar Sekarang</a>
+                    <a href="{{ route('register') }}" class="btn btn-primary btn-lg">Daftar sebagai seller</a>
                 @endauth
             </div>
         </div>
@@ -179,10 +160,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const show = (index) => {
         slides[current].classList.add('hidden');
-        dots[current]?.classList.remove('bg-white!');
+        dots[current]?.querySelector('span')?.classList.remove('is-active');
         current = (index + slides.length) % slides.length;
         slides[current].classList.remove('hidden');
-        dots[current]?.classList.add('bg-white!');
+        dots[current]?.querySelector('span')?.classList.add('is-active');
     };
 
     dots.forEach((dot, i) => dot.addEventListener('click', () => { show(i); restart(); }));
