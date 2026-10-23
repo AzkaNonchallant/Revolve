@@ -60,7 +60,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8">
         {{-- Filter sidebar --}}
         <aside class="hidden lg:block">
-            <form action="{{ route('products.index') }}" method="GET" class="card elevation-1 bg-surface p-5 lg:sticky lg:top-24 space-y-6">
+            <form action="{{ route('products.index') }}" method="GET" class="product-filter-form lg:sticky lg:top-24 space-y-6">
                 @if (request('search'))
                     <input type="hidden" name="search" value="{{ request('search') }}">
                 @endif
@@ -194,12 +194,12 @@
 </div>
 
 {{-- Mobile filter --}}
-<div data-mobile-filter-panel class="fixed inset-0 z-50 hidden lg:hidden">
-    <div class="absolute inset-0 bg-black/50" data-mobile-filter-close></div>
-    <div class="absolute left-0 top-0 bottom-0 w-[300px] max-w-[85vw] bg-white overflow-y-auto">
+<div data-mobile-filter-panel class="fixed inset-0 z-50 hidden lg:hidden" role="dialog" aria-modal="true" aria-labelledby="mobile-filter-title" aria-hidden="true">
+    <div class="absolute inset-0 bg-black/50" data-mobile-filter-close="backdrop"></div>
+    <div class="absolute left-0 top-0 bottom-0 w-[22rem] max-w-[90vw] bg-white overflow-y-auto">
         <div class="flex items-center justify-between px-5 h-16 border-b border-surface-muted">
-            <h2 class="text-title-md font-semibold">Filter Produk</h2>
-            <button type="button" data-mobile-filter-close class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-muted" aria-label="Tutup">
+            <h2 id="mobile-filter-title" class="text-title-md font-semibold">Filter Produk</h2>
+            <button type="button" data-mobile-filter-close="button" class="w-11 h-11 flex items-center justify-center hover:bg-surface-muted" aria-label="Tutup filter">
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
             </button>
         </div>
@@ -272,8 +272,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const open = document.querySelector('[data-mobile-filter-open]');
     const close = document.querySelectorAll('[data-mobile-filter-close]');
     if (panel && open) {
-        open.addEventListener('click', () => panel.classList.remove('hidden'));
-        close.forEach((el) => el.addEventListener('click', () => panel.classList.add('hidden')));
+        const closePanel = () => {
+            panel.classList.add('hidden');
+            panel.setAttribute('aria-hidden', 'true');
+            open.focus();
+        };
+
+        open.addEventListener('click', () => {
+            panel.classList.remove('hidden');
+            panel.setAttribute('aria-hidden', 'false');
+            panel.querySelector('[data-mobile-filter-close="button"]')?.focus();
+        });
+        close.forEach((el) => el.addEventListener('click', closePanel));
+        panel.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closePanel();
+            } else if (event.key === 'Tab') {
+                const focusable = [...panel.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])')];
+                const first = focusable[0];
+                const last = focusable.at(-1);
+
+                if (event.shiftKey && document.activeElement === first) {
+                    event.preventDefault();
+                    last?.focus();
+                } else if (!event.shiftKey && document.activeElement === last) {
+                    event.preventDefault();
+                    first?.focus();
+                }
+            }
+        });
     }
 });
 </script>

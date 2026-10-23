@@ -11,7 +11,7 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-body bg-surface-subtle text-text-primary min-h-screen flex flex-col">
+    <body class="font-body bg-white text-text-primary min-h-screen flex flex-col">
         @include('partials.navbar')
 
         <main class="flex-grow">

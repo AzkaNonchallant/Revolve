@@ -33,7 +33,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
         {{-- Gallery --}}
         <div>
-            <div class="card elevation-1 bg-surface overflow-hidden aspect-square rounded-2xl mb-4">
+            <div class="product-gallery-main overflow-hidden aspect-square mb-4">
                 <img id="gallery-main" src="{{ $images->first()->image ? asset('storage/' . $images->first()->image) : '' }}"
                     alt="{{ $product->name }}" class="w-full h-full object-cover">
             </div>
@@ -41,7 +41,7 @@
                 <div class="grid grid-cols-5 gap-2">
                     @foreach ($images->take(5) as $image)
                         <button type="button" data-gallery-thumb data-src="{{ asset('storage/' . $image->image) }}"
-                            class="aspect-square rounded-xl overflow-hidden border-2 {{ $loop->first ? 'border-obsidian' : 'border-transparent' }} hover:border-obsidian transition-colors">
+                            class="product-gallery-thumb aspect-square overflow-hidden border {{ $loop->first ? 'is-active' : '' }}">
                             <img src="{{ asset('storage/' . $image->image) }}" alt="" class="w-full h-full object-cover">
                         </button>
                     @endforeach
@@ -52,7 +52,7 @@
         {{-- Info --}}
         <div>
             @if ($shop)
-                <a href="{{ route('shops.show', $shop) }}" class="inline-flex items-center gap-2 mb-4 card elevation-1 bg-surface px-3 py-2 rounded-full hover:border-obsidian transition-colors">
+                <a href="{{ route('shops.show', $shop) }}" class="inline-flex items-center gap-2 mb-4 text-sm font-semibold hover:underline">
                     @if ($shop->logo)
                         <img src="{{ asset('storage/' . $shop->logo) }}" alt="{{ $shop->name }}" class="w-6 h-6 rounded-full object-cover">
                     @else
@@ -78,7 +78,7 @@
                 </span>
             </div>
 
-            <div class="card elevation-1 bg-surface p-5 lg:p-6 mb-6">
+            <div class="product-price-panel mb-6">
                 <div class="flex flex-wrap items-end gap-x-4 gap-y-1 mb-2">
                     <p class="text-price text-3xl">Rp {{ number_format($price, 0, ',', '.') }}</p>
                     @if ($hasDiscount)
@@ -144,7 +144,7 @@
                 </div>
             </form>
 
-            <div class="space-y-2 text-sm text-text-secondary">
+            <div class="product-detail-meta space-y-2 text-sm text-text-secondary">
                 @if ($product->brand)
                     <p class="flex items-center gap-2"><span class="badge badge-muted">Brand</span> {{ $product->brand->name }}</p>
                 @endif
@@ -160,7 +160,7 @@
     {{-- Description --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
         <div class="lg:col-span-2">
-            <div class="card elevation-1 bg-surface p-6 lg:p-8">
+            <div class="product-copy-panel p-0">
                 <h2 class="text-headline-sm mb-4">Deskripsi Produk</h2>
                 <div class="prose max-w-none">
                     @if ($product->description)
@@ -172,7 +172,7 @@
             </div>
 
             {{-- Reviews --}}
-            <div class="card elevation-1 bg-surface p-6 lg:p-8 mt-8">
+            <div class="product-reviews-panel mt-12">
                 <h2 class="text-headline-sm mb-6">Ulasan Pembeli</h2>
                 <div class="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-8 mb-8">
                     <div class="text-center">
@@ -222,7 +222,7 @@
                         @endforeach
                     </div>
                 @else
-                    <div class="card bg-surface-subtle p-6 text-center">
+                    <div class="bg-surface-subtle p-6 text-center">
                         <p class="text-text-muted">Belum ada ulasan untuk produk ini.</p>
                     </div>
                 @endif
@@ -232,13 +232,13 @@
         {{-- Sidebar info --}}
         <div class="space-y-4 lg:sticky lg:top-24 h-fit">
             @if ($shop)
-                <div class="card elevation-1 bg-surface p-6">
+                <div class="product-sidebar-panel p-0">
                     <h3 class="text-title-md font-semibold mb-2">{{ $shop->name }}</h3>
                     <p class="text-sm text-text-muted mb-3">{{ $shop->description ?: 'Seller Revolve.' }}</p>
                     <a href="{{ route('shops.show', $shop) }}" class="btn btn-outline w-full">Kunjungi Toko</a>
                 </div>
             @endif
-            <div class="card elevation-1 bg-surface p-6">
+            <div class="product-sidebar-panel p-0">
                 <h3 class="text-title-md font-semibold mb-3">Pengiriman</h3>
                 <ul class="space-y-2 text-sm text-text-secondary">
                     <li class="flex items-center gap-2">· Estimasi 1–4 hari kerja</li>

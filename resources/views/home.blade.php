@@ -6,7 +6,7 @@
     {{-- Hero: the campaign image is the visual focal point, while the copy stays easy to scan. --}}
     @if ($heroBanners->isNotEmpty())
         <section class="home-hero bg-surface">
-            <div data-hero-slider class="relative">
+            <div data-hero-slider class="relative" role="region" aria-label="Kampanye Revolve" aria-roledescription="carousel">
                 @foreach ($heroBanners as $banner)
                     <div class="data-hero-slide {{ $loop->first ? '' : 'hidden' }}" data-hero-slide>
                         <div class="container-app py-10 lg:py-14 grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-8 lg:gap-12 items-center">
@@ -35,8 +35,14 @@
                 @if ($heroBanners->count() > 1)
                     <div class="absolute bottom-6 left-4 lg:left-1/2 lg:-translate-x-1/2 flex items-center gap-2 z-10">
                         @foreach ($heroBanners as $banner)
-                            <button type="button" data-hero-dot class="w-11 h-11 flex items-center justify-center" aria-label="Tampilkan slide {{ $loop->iteration }}"><span class="home-hero-dot {{ $loop->first ? 'is-active' : '' }}"></span></button>
+                            <button type="button" data-hero-dot class="w-11 h-11 flex items-center justify-center" aria-label="Tampilkan slide {{ $loop->iteration }}" aria-pressed="{{ $loop->first ? 'true' : 'false' }}"><span class="home-hero-dot {{ $loop->first ? 'is-active' : '' }}"></span></button>
                         @endforeach
+                        <button type="button" data-hero-prev class="hero-slider-control" aria-label="Kampanye sebelumnya">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+                        </button>
+                        <button type="button" data-hero-next class="hero-slider-control" aria-label="Kampanye berikutnya">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                        </button>
                     </div>
                 @endif
             </div>
@@ -133,7 +139,7 @@
     <section class="container-app pb-16">
         <div class="seller-callout">
             <div>
-                <p class="section-kicker text-primary-fixed">Untuk seller</p>
+                <p class="section-kicker text-white/70">Untuk seller</p>
                 <h2 class="text-headline-md text-white mb-2">Bawa koleksimu ke Revolve.</h2>
                 <p class="text-white/70 text-sm max-w-lg">Buka toko dan kelola produk fashionmu dari satu tempat.</p>
             </div>
@@ -147,31 +153,3 @@
         </div>
     </section>
 @endsection
-
-@push('scripts')
-@if ($heroBanners->count() > 1)
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const slides = [...document.querySelectorAll('[data-hero-slide]')];
-    const dots = [...document.querySelectorAll('[data-hero-dot]')];
-    if (slides.length < 2) return;
-    let current = 0;
-    let timer;
-
-    const show = (index) => {
-        slides[current].classList.add('hidden');
-        dots[current]?.querySelector('span')?.classList.remove('is-active');
-        current = (index + slides.length) % slides.length;
-        slides[current].classList.remove('hidden');
-        dots[current]?.querySelector('span')?.classList.add('is-active');
-    };
-
-    dots.forEach((dot, i) => dot.addEventListener('click', () => { show(i); restart(); }));
-
-    const next = () => show(current + 1);
-    const restart = () => { clearInterval(timer); timer = setInterval(next, 5000); };
-    restart();
-});
-</script>
-@endif
-@endpush
