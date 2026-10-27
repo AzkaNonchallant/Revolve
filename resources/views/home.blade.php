@@ -3,43 +3,40 @@
 @section('title', 'Revolve | Pilihan Style Harian')
 
 @section('content')
-    {{-- Hero: the campaign image is the visual focal point, while the copy stays easy to scan. --}}
     @if ($heroBanners->isNotEmpty())
         <section class="home-hero bg-surface">
             <div data-hero-slider class="relative" role="region" aria-label="Kampanye Revolve" aria-roledescription="carousel">
                 @foreach ($heroBanners as $banner)
-                    <div class="data-hero-slide {{ $loop->first ? '' : 'hidden' }}" data-hero-slide>
-                        <div class="container-app py-10 lg:py-14 grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-8 lg:gap-12 items-center">
-                            <div class="order-2 lg:order-1">
-                                @if ($banner->category)
-                                    <p class="text-label-sm text-primary-ink mb-5">{{ $banner->category->name }}</p>
-                                @endif
-                                <h1 class="text-display-xl max-w-xl mb-5">{!! $banner->title !!}</h1>
-                                <p class="max-w-md text-body-lg text-text-secondary mb-8">Pilihan fashion yang mudah dipadukan untuk hari yang terus bergerak.</p>
-                                <div class="flex flex-wrap gap-3">
+                    <div class="data-hero-slide {{ $loop->first ? '' : 'hidden' }}" data-hero-slide role="group" aria-roledescription="slide" aria-label="Slide {{ $loop->iteration }} dari {{ $heroBanners->count() }}" aria-hidden="{{ $loop->first ? 'false' : 'true' }}">
+                        <div class="home-hero-layout">
+                            <div class="home-hero-copy">
+                                <p class="home-hero-eyebrow">Koleksi Terbaru</p>
+                                <h1 class="home-hero-title"><span>Gaya yang bergerak</span><span>bersama kamu.</span></h1>
+                                <p class="home-hero-description">Temukan pilihan fashion terbaru untuk melengkapi setiap aktivitas dan gaya harianmu.</p>
+                                <div class="home-hero-actions">
                                     <a href="{{ $banner->link ?: route('products.index') }}" class="btn btn-primary btn-lg">Belanja koleksi</a>
                                     <a href="{{ route('products.index') }}" class="btn btn-outline btn-lg">Lihat semua produk</a>
                                 </div>
                             </div>
-                            <div class="order-1 lg:order-2 home-hero-media">
+                            <div class="home-hero-media">
                                 @if ($banner->image)
-                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}" class="w-full h-full object-cover">
+                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="Kampanye fashion Revolve" class="home-hero-product-image">
                                 @else
-                                    <img src="{{ asset('images/revolve-hero-shoe.png') }}" alt="Sepatu Air Jordan hitam putih" class="home-hero-shoe">
+                                    <img src="{{ asset('images/revolve-hero-shoe.png') }}" alt="Sepatu hitam putih" class="home-hero-product-image">
                                 @endif
-                                <div class="home-hero-caption">{{ $banner->category?->name ?: 'Pilihan Revolve' }}</div>
                             </div>
+                            <div class="home-hero-caption">Pilihan Revolve</div>
                         </div>
                     </div>
                 @endforeach
                 @if ($heroBanners->count() > 1)
-                    <div class="absolute bottom-6 left-4 lg:left-1/2 lg:-translate-x-1/2 flex items-center gap-2 z-10">
-                        @foreach ($heroBanners as $banner)
-                            <button type="button" data-hero-dot class="w-11 h-11 flex items-center justify-center" aria-label="Tampilkan slide {{ $loop->iteration }}" aria-pressed="{{ $loop->first ? 'true' : 'false' }}"><span class="home-hero-dot {{ $loop->first ? 'is-active' : '' }}"></span></button>
-                        @endforeach
+                    <div class="home-hero-controls" aria-label="Kontrol kampanye">
                         <button type="button" data-hero-prev class="hero-slider-control" aria-label="Kampanye sebelumnya">
                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
                         </button>
+                        @foreach ($heroBanners as $banner)
+                            <button type="button" data-hero-dot class="w-11 h-11 flex items-center justify-center" aria-label="Tampilkan slide {{ $loop->iteration }}" aria-pressed="{{ $loop->first ? 'true' : 'false' }}"><span class="home-hero-dot {{ $loop->first ? 'is-active' : '' }}"></span></button>
+                        @endforeach
                         <button type="button" data-hero-next class="hero-slider-control" aria-label="Kampanye berikutnya">
                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
                         </button>
@@ -49,16 +46,20 @@
         </section>
     @else
         <section class="home-hero home-hero-fallback">
-            <div class="container-app py-12 lg:py-16 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                <div>
-                    <p class="text-label-sm text-primary-ink mb-5">Revolve fashion</p>
-                    <h1 class="text-display-xl max-w-xl mb-5">Temukan gaya yang terasa seperti kamu.</h1>
-                    <p class="text-body-lg text-text-secondary max-w-md mb-8">Sepatu, pakaian, dan aksesori dari seller pilihan di satu tempat.</p>
-                    <a href="{{ route('products.index') }}" class="btn btn-primary btn-lg">Mulai belanja</a>
+            <div class="home-hero-layout">
+                <div class="home-hero-copy">
+                    <p class="home-hero-eyebrow">Koleksi Terbaru</p>
+                    <h1 class="home-hero-title"><span>Gaya yang bergerak</span><span>bersama kamu.</span></h1>
+                    <p class="home-hero-description">Temukan pilihan fashion terbaru untuk melengkapi setiap aktivitas dan gaya harianmu.</p>
+                    <div class="home-hero-actions">
+                        <a href="{{ route('products.index') }}" class="btn btn-primary btn-lg">Belanja koleksi</a>
+                        <a href="{{ route('products.index') }}" class="btn btn-outline btn-lg">Lihat semua produk</a>
+                    </div>
                 </div>
                 <div class="home-hero-media">
-                    <img src="{{ asset('images/revolve-hero-shoe.png') }}" alt="Sepatu Air Jordan hitam putih" class="home-hero-shoe">
+                    <img src="{{ asset('images/revolve-hero-shoe.png') }}" alt="Sepatu hitam putih" class="home-hero-product-image">
                 </div>
+                <div class="home-hero-caption">Pilihan Revolve</div>
             </div>
         </section>
     @endif

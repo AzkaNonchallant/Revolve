@@ -76,6 +76,11 @@ class ProductController extends Controller
         $query->withCount(['orderItems as sold_count' => fn ($q) => $q->whereHas('order', fn ($o) => $o->whereIn('status', ['paid', 'processed', 'packing', 'shipped', 'delivered', 'completed']))]);
 
         switch ($request->get('sort')) {
+            case 'discount':
+                $query->whereNotNull('discount_price')
+                    ->whereColumn('discount_price', '<', 'price')
+                    ->orderByRaw('(price - discount_price) DESC');
+                break;
             case 'price_asc':
                 $query->orderByRaw('COALESCE(discount_price, price) ASC');
                 break;
