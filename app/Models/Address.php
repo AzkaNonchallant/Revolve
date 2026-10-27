@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 
 #[Fillable([
     'user_id', 'receiver_name', 'phone', 'province', 'city',
-    'district', 'village', 'postal_code', 'full_address', 'is_default'
+    'district', 'village', 'postal_code', 'full_address',
+    'courier_note', 'latitude', 'longitude', 'is_default',
 ])]
 class Address extends Model
 {
@@ -18,6 +19,8 @@ class Address extends Model
     {
         return [
             'is_default' => 'boolean',
+            'latitude' => 'decimal:7',
+            'longitude' => 'decimal:7',
         ];
     }
 
@@ -29,5 +32,10 @@ class Address extends Model
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function hasCoordinates(): bool
+    {
+        return $this->latitude !== null && $this->longitude !== null;
     }
 }

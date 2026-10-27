@@ -13,29 +13,54 @@
         {{-- Profile info --}}
         <div class="card elevation-1 bg-surface p-6 lg:p-8">
             <h2 class="text-headline-sm mb-6">Informasi Akun</h2>
-            <form method="POST" action="{{ route('profile.update') }}" class="w-full">
+            <div class="flex items-center gap-4 mb-6">
+                @if ($user->avatar)
+                    <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" class="w-20 h-20 rounded-full object-cover">
+                @else
+                    <span class="w-20 h-20 rounded-full bg-obsidian text-white text-2xl font-bold flex items-center justify-center">{{ strtoupper(substr($user->name, 0, 1)) }}</span>
+                @endif
+                <div>
+                    <p class="text-title-md font-semibold">{{ $user->name }}</p>
+                    <p class="text-sm text-text-muted">{{ $user->email }}</p>
+                    <span class="badge badge-primary mt-1">{{ $user->roleLabel() }}</span>
+                </div>
+                <div class="flex-grow"></div>
+                <a href="{{ $user->dashboardRoute() }}" class="btn btn-outline btn-sm">Dashboard</a>
+            </div>
+
+            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="w-full">
                 @csrf
                 @method('PATCH')
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="form-group mb-0! sm:col-span-2">
-                        <label for="name" class="form-label">Nama Lengkap</label>
-                        <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}" required
-                            class="form-input @error('name') is-error @enderror">
-                        @error('name')
-                            <span class="form-error">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    <div class="form-group mb-0! sm:col-span-2">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}" required
-                            class="form-input @error('email') is-error @enderror">
-                        @error('email')
-                            <span class="form-error">{{ $message }}</span>
-                        @enderror
-                    </div>
+                <div class="form-group mb-0!">
+                    <label for="avatar" class="form-label">Foto Profil <span class="font-normal text-text-muted">(opsional, maks 2MB)</span></label>
+                    <input type="file" name="avatar" id="avatar" accept="image/*" class="form-input @error('avatar') is-error @enderror">
+                    @error('avatar')
+                        <span class="form-error">{{ $message }}</span>
+                    @enderror
                 </div>
-                <button type="submit" class="btn btn-primary mt-8">Simpan Perubahan</button>
+                <button type="submit" class="btn btn-primary mt-6">Simpan Foto Profil</button>
             </form>
+
+            <div class="divider my-6!"></div>
+
+            <p class="text-sm text-text-secondary mb-4">
+                Ingin mengubah nama, email, atau nomor telepon? Data tersebut memerlukan persetujuan Admin.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="p-4 rounded-xl bg-surface-subtle">
+                    <p class="text-label-sm text-text-muted">Nama</p>
+                    <p class="text-sm font-semibold truncate">{{ $user->name }}</p>
+                </div>
+                <div class="p-4 rounded-xl bg-surface-subtle">
+                    <p class="text-label-sm text-text-muted">Email</p>
+                    <p class="text-sm font-semibold truncate">{{ $user->email }}</p>
+                </div>
+                <div class="p-4 rounded-xl bg-surface-subtle">
+                    <p class="text-label-sm text-text-muted">Telepon</p>
+                    <p class="text-sm font-semibold">{{ $user->phone_number ?? '—' }}</p>
+                </div>
+            </div>
+            <a href="{{ route('change-requests.index') }}" class="btn btn-outline btn-sm mt-4">Ajukan Perubahan Data</a>
         </div>
 
         {{-- Password --}}

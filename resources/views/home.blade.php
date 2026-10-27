@@ -1,84 +1,82 @@
 @extends('layouts.app')
 
-@section('title', 'Revolve — Belanja Produk Kesehatan Pilihan')
+@section('title', 'Revolve | Pilihan Style Harian')
 
 @section('content')
-    {{-- Hero --}}
-    <section class="bg-obsidian text-white">
-        <div class="container-app py-14 lg:py-20 relative overflow-hidden">
-            <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-10" style="background: radial-gradient(circle, #FF5400 0%, transparent 70%);"></div>
-            <div class="absolute -bottom-32 -left-24 w-80 h-80 rounded-full opacity-5" style="background: radial-gradient(circle, #FF5400 0%, transparent 70%);"></div>
-            <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-                <div>
-                    <span class="badge badge-primary mb-6"></span>
-                    <h1 class="text-display-xl mb-6">
-                        Upgrade Gayamu,<br class="hidden lg:block">
-                        <span class="text-primary">Tentukan Pilihanmu</span>
-                    </h1>
-                    <p class="text-lg text-white/70 mb-8 max-w-lg leading-relaxed">
-                        Temukan Style yang cocok dengan Anda!
-                    </p>
-                    <div class="flex flex-wrap gap-3">
-                        <a href="{{ route('products.index') }}" class="btn btn-primary btn-lg">
-                            Belanja Sekarang
-                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M5 12h14M12 5l7 7-7 7"/>
-                            </svg>
-                        </a>
-                        @auth
-                            <a href="{{ route('orders.index') }}" class="btn btn-outline btn-lg bg-transparent! border-white/30! text-white! hover:bg-white/10!">
-                                Lihat Pesanan
-                            </a>
-                        @else
-                            <a href="{{ route('register') }}" class="btn btn-outline btn-lg bg-transparent! border-white/30! text-white! hover:bg-white/10!">
-                                Daftar Gratis
-                            </a>
-                        @endauth
-                    </div>
-                    <div class="flex items-center gap-8 mt-10">
-                        <div>
-                            <p class="text-headline-md font-bold text-primary">100%</p>
-                            <p class="text-xs text-white/60 mt-1">Produk Terkurasi</p>
-                        </div>
-                        <div class="w-px h-10 bg-white/15"></div>
-                        <div>
-                            <p class="text-headline-md font-bold text-primary">{{ $categories->count() }}</p>
-                            <p class="text-xs text-white/60 mt-1">Kategori Produk</p>
-                        </div>
-                        <div class="w-px h-10 bg-white/15"></div>
-                        <div>
-                            <p class="text-headline-md font-bold text-primary">{{ $featuredProducts->count() }}+</p>
-                            <p class="text-xs text-white/60 mt-1">Produk Pilihan</p>
+    @if ($heroBanners->isNotEmpty())
+        <section class="home-hero bg-surface">
+            <div data-hero-slider class="relative" role="region" aria-label="Kampanye Revolve" aria-roledescription="carousel">
+                @foreach ($heroBanners as $banner)
+                    <div class="data-hero-slide {{ $loop->first ? '' : 'hidden' }}" data-hero-slide role="group" aria-roledescription="slide" aria-label="Slide {{ $loop->iteration }} dari {{ $heroBanners->count() }}" aria-hidden="{{ $loop->first ? 'false' : 'true' }}">
+                        <div class="home-hero-layout">
+                            <div class="home-hero-copy">
+                                <p class="home-hero-eyebrow">Koleksi Terbaru</p>
+                                <h1 class="home-hero-title"><span>Gaya yang bergerak</span><span>bersama kamu.</span></h1>
+                                <p class="home-hero-description">Temukan pilihan fashion terbaru untuk melengkapi setiap aktivitas dan gaya harianmu.</p>
+                                <div class="home-hero-actions">
+                                    <a href="{{ $banner->link ?: route('products.index') }}" class="btn btn-primary btn-lg">Belanja koleksi</a>
+                                    <a href="{{ route('products.index') }}" class="btn btn-outline btn-lg">Lihat semua produk</a>
+                                </div>
+                            </div>
+                            <div class="home-hero-media">
+                                @if ($banner->image)
+                                    <img src="{{ asset('storage/' . $banner->image) }}" alt="Kampanye fashion Revolve" class="home-hero-product-image">
+                                @else
+                                    <img src="{{ asset('images/revolve-hero-shoe.png') }}" alt="Sepatu hitam putih" class="home-hero-product-image">
+                                @endif
+                            </div>
+                            <div class="home-hero-caption">Pilihan Revolve</div>
                         </div>
                     </div>
-                </div>
-                <div class="hidden lg:block">
-                    <div class="rounded-2xl bg-white/5 border border-white/10 p-8 text-center">
-                        <svg class="w-24 h-24 mx-auto mb-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                            <path d="M2 17l10 5 10-5"/>
-                            <path d="M2 12l10 5 10-5"/>
-                        </svg>
-                        <h2 class="text-headline-md mb-2">Revolve</h2>
-                        <p class="text-white/60 text-sm">Belanja cerdas untuk tubuh yang lebih sehat dan berenergi.</p>
+                @endforeach
+                @if ($heroBanners->count() > 1)
+                    <div class="home-hero-controls" aria-label="Kontrol kampanye">
+                        <button type="button" data-hero-prev class="hero-slider-control" aria-label="Kampanye sebelumnya">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+                        </button>
+                        @foreach ($heroBanners as $banner)
+                            <button type="button" data-hero-dot class="w-11 h-11 flex items-center justify-center" aria-label="Tampilkan slide {{ $loop->iteration }}" aria-pressed="{{ $loop->first ? 'true' : 'false' }}"><span class="home-hero-dot {{ $loop->first ? 'is-active' : '' }}"></span></button>
+                        @endforeach
+                        <button type="button" data-hero-next class="hero-slider-control" aria-label="Kampanye berikutnya">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                        </button>
                     </div>
-                </div>
+                @endif
             </div>
-        </div>
-    </section>
+        </section>
+    @else
+        <section class="home-hero home-hero-fallback">
+            <div class="home-hero-layout">
+                <div class="home-hero-copy">
+                    <p class="home-hero-eyebrow">Koleksi Terbaru</p>
+                    <h1 class="home-hero-title"><span>Gaya yang bergerak</span><span>bersama kamu.</span></h1>
+                    <p class="home-hero-description">Temukan pilihan fashion terbaru untuk melengkapi setiap aktivitas dan gaya harianmu.</p>
+                    <div class="home-hero-actions">
+                        <a href="{{ route('products.index') }}" class="btn btn-primary btn-lg">Belanja koleksi</a>
+                        <a href="{{ route('products.index') }}" class="btn btn-outline btn-lg">Lihat semua produk</a>
+                    </div>
+                </div>
+                <div class="home-hero-media">
+                    <img src="{{ asset('images/revolve-hero-shoe.png') }}" alt="Sepatu hitam putih" class="home-hero-product-image">
+                </div>
+                <div class="home-hero-caption">Pilihan Revolve</div>
+            </div>
+        </section>
+    @endif
 
-    {{-- Categories --}}
-    <section class="container-app py-10 lg:py-14">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-headline-lg">Kategori</h2>
-            <a href="{{ route('products.index') }}" class="text-sm font-semibold text-primary hover:text-primary-hover">Semua Produk →</a>
+    <section class="container-app py-6 lg:py-8">
+        <div class="flex items-end justify-between gap-4 mb-4">
+            <div>
+                <p class="section-kicker">Jelajahi</p>
+                <h2 class="text-headline-md">Kategori pilihan</h2>
+            </div>
+            <a href="{{ route('products.index') }}" class="text-sm font-semibold text-primary-ink hover:text-primary-hover hidden sm:inline">Semua produk</a>
         </div>
         @if ($categories->isNotEmpty())
-            <div class="flex flex-wrap gap-2">
+            <div class="category-rail" aria-label="Kategori produk">
                 @foreach ($categories as $cat)
-                    <a href="{{ route('categories.show', $cat) }}" class="chip">
+                    <a href="{{ route('categories.show', $cat) }}" class="category-chip">
                         {{ $cat->name }}
-                        <span class="ml-1.5 text-xs text-text-muted">{{ $cat->products_count }}</span>
                     </a>
                 @endforeach
             </div>
@@ -87,15 +85,38 @@
         @endif
     </section>
 
-    {{-- Featured Products --}}
+    <section class="container-app pb-14" id="discounts">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <p class="section-kicker">Harga pilihan</p>
+                <h2 class="text-headline-lg">Sedang diskon</h2>
+            </div>
+                <a href="{{ route('products.index', ['sort' => 'discount']) }}" class="text-sm font-semibold text-primary-ink hover:text-primary-hover hidden sm:inline">Lihat semua</a>
+        </div>
+        @if ($discountProducts->isNotEmpty())
+            <div class="grid-products">
+                @foreach ($discountProducts as $product)
+                    @include('partials.product-card', ['product' => $product])
+                @endforeach
+            </div>
+        @else
+            <div class="card elevation-1 bg-surface py-10 text-center text-text-muted">
+                Belum ada produk diskon saat ini. Cek kembali setelah koleksi baru masuk.
+            </div>
+        @endif
+    </section>
+
     <section class="container-app pb-16">
         <div class="flex items-center justify-between mb-8">
-            <h2 class="text-headline-lg">Produk Pilihan</h2>
-            <a href="{{ route('products.index') }}" class="text-sm font-semibold text-primary hover:text-primary-hover hidden sm:inline">Lihat Semua →</a>
+            <div>
+                <p class="section-kicker">Baru masuk</p>
+                <h2 class="text-headline-lg">Koleksi terbaru</h2>
+            </div>
+                <a href="{{ route('products.index') }}" class="text-sm font-semibold text-primary-ink hover:text-primary-hover hidden sm:inline">Lihat semua</a>
         </div>
-        @if ($featuredProducts->isNotEmpty())
+        @if ($latestProducts->isNotEmpty())
             <div class="grid-products">
-                @foreach ($featuredProducts as $product)
+                @foreach ($latestProducts as $product)
                     @include('partials.product-card', ['product' => $product])
                 @endforeach
             </div>
@@ -116,20 +137,18 @@
         @endif
     </section>
 
-    {{-- CTA Banner --}}
     <section class="container-app pb-16">
-        <div class="bg-obsidian rounded-2xl p-8 lg:p-12 flex flex-col lg:flex-row items-center justify-between gap-6 relative overflow-hidden">
-            <div class="absolute -top-16 -right-16 w-64 h-64 rounded-full opacity-10" style="background: radial-gradient(circle, #FF5400 0%, transparent 70%);"></div>
-            <div class="relative">
-                <span class="badge badge-primary mb-3">Promo Kesehatan</span>
-                <h2 class="text-headline-md text-white mb-2">Raih Tubuh Sehat dengan Revolve</h2>
-                <p class="text-white/60 text-sm">Daftar sekarang dan mulai belanja produk kesehatan terbaik untuk keluarga Anda.</p>
+        <div class="seller-callout">
+            <div>
+                <p class="section-kicker text-white/70">Untuk seller</p>
+                <h2 class="text-headline-md text-white mb-2">Bawa koleksimu ke Revolve.</h2>
+                <p class="text-white/70 text-sm max-w-lg">Buka toko dan kelola produk fashionmu dari satu tempat.</p>
             </div>
-            <div class="relative shrink-0">
+            <div class="shrink-0">
                 @auth
-                    <a href="{{ route('products.index') }}" class="btn btn-primary btn-lg">Mulai Belanja</a>
+                    <a href="{{ route('seller-request.create') }}" class="btn btn-primary btn-lg">Buka toko</a>
                 @else
-                    <a href="{{ route('register') }}" class="btn btn-primary btn-lg">Daftar Sekarang</a>
+                    <a href="{{ route('register') }}" class="btn btn-primary btn-lg">Daftar sebagai seller</a>
                 @endauth
             </div>
         </div>

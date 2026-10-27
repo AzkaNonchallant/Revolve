@@ -36,6 +36,18 @@
 
             @include('partials.alerts')
 
+            @if ($order->isPayable())
+                <div class="bg-primary/5 border border-primary/30 rounded-xl p-4 mb-8">
+                    <p class="text-sm text-text-secondary mb-3">Selesaikan pembayaran untuk melanjutkan proses pesanan. <span class="font-semibold text-text-primary">(Simulasi payment gateway — klik tombol di bawah)</span></p>
+                    <form action="{{ route('orders.pay', $order) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-primary w-full">
+                            Bayar Sekarang — Rp {{ number_format((float) $order->total, 0, ',', '.') }}
+                        </button>
+                    </form>
+                </div>
+            @endif
+
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
                 <a href="{{ route('orders.show', $order) }}" class="btn btn-primary flex-grow sm:flex-grow-0">
                     Lihat Detail Pesanan
